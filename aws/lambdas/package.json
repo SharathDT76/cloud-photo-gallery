@@ -1,0 +1,13 @@
+{
+  "name": "photo-gallery-lambdas",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Lambda functions for the Shadow Gallery (S3, DynamoDB, Cognito).",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.620.0",
+    "@aws-sdk/s3-request-presigner": "^3.620.0",
+    "@aws-sdk/client-dynamodb": "^3.620.0",
+    "@aws-sdk/lib-dynamodb": "^3.620.0",
+    "sharp": "^0.33.4"
+  }
+}

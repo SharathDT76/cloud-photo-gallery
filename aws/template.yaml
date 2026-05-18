@@ -1,0 +1,165 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Shadow Gallery — Cloud Photo Gallery (S3 + DynamoDB + Cognito + API Gateway + Lambda + CloudFront)
+
+Parameters:
+  OriginalBucket:
+    Type: String
+    Default: shadow-photo-originals-709147558119
+  ThumbnailBucket:
+    Type: String
+    Default: shadow-photo-thumbnails-709147558119
+  DdbTable:
+    Type: String
+    Default: PhotoGalleryMetadata
+  CognitoUserPoolId:
+    Type: String
+    Default: ap-south-1_uEX9otfnG
+  CognitoUserPoolClientId:
+    Type: String
+    Default: 4lrn7smuuif5nbn4dgfcqm6ivs
+  CloudFrontDomain:
+    Type: String
+    Default: ''
+
+Globals:
+  Function:
+    Runtime: nodejs18.x
+    Timeout: 30
+    MemorySize: 512
+    Architectures:
+      - x86_64
+    Environment:
+      Variables:
+        ORIGINAL_BUCKET: !Ref OriginalBucket
+        THUMBNAIL_BUCKET: !Ref ThumbnailBucket
+        DDB_TABLE: !Ref DdbTable
+        CLOUDFRONT_DOMAIN: !Ref CloudFrontDomain
+
+Resources:
+  PhotosTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref DdbTable
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: owner
+          AttributeType: S
+        - AttributeName: photo_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: owner
+          KeyType: HASH
+        - AttributeName: photo_id
+          KeyType: RANGE
+
+  Api:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      Cors:
+        AllowMethods: "'GET,POST,DELETE,OPTIONS'"
+        AllowHeaders: "'Authorization,Content-Type'"
+        AllowOrigin: "'*'"
+      Auth:
+        DefaultAuthorizer: CognitoAuth
+        Authorizers:
+          CognitoAuth:
+            UserPoolArn: !Sub arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${CognitoUserPoolId}
+
+  GetUploadUrlFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/getUploadUrl/
+      Handler: index.handler
+      Policies:
+        - S3WritePolicy: { BucketName: !Ref OriginalBucket }
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /photos/upload-url
+            Method: get
+
+  ConfirmUploadFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/confirmUpload/
+      Handler: index.handler
+      Policies:
+        - S3ReadPolicy: { BucketName: !Ref OriginalBucket }
+        - DynamoDBCrudPolicy: { TableName: !Ref DdbTable }
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /photos/confirm-upload
+            Method: post
+
+  ListPhotosFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/listPhotos/
+      Handler: index.handler
+      Policies:
+        - DynamoDBReadPolicy: { TableName: !Ref DdbTable }
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /photos
+            Method: get
+
+  ThumbnailGeneratorFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/thumbnailGenerator/
+      Handler: index.handler
+      MemorySize: 1536
+      Timeout: 60
+      Policies:
+        - S3ReadPolicy: { BucketName: !Ref OriginalBucket }
+        - S3WritePolicy: { BucketName: !Ref ThumbnailBucket }
+        - DynamoDBCrudPolicy: { TableName: !Ref DdbTable }
+      Events:
+        S3Upload:
+          Type: S3
+          Properties:
+            Bucket: !Ref OriginalBucketResource
+            Events: s3:ObjectCreated:*
+
+  OriginalBucketResource:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref OriginalBucket
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders: ['*']
+            AllowedMethods: [PUT, POST, GET]
+            AllowedOrigins: ['*']
+            ExposedHeaders: [ETag]
+
+  ThumbnailBucketResource:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref ThumbnailBucket
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders: ['*']
+            AllowedMethods: [GET]
+            AllowedOrigins: ['*']
+
+Outputs:
+  ApiUrl:
+    Description: Invoke URL
+    Value: !Sub "https://${Api}.execute-api.${AWS::Region}.amazonaws.com/prod"
+  PhotosTable:
+    Value: !Ref PhotosTable

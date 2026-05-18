@@ -1,0 +1,73 @@
+{
+  "theme": "light",
+  "archetype": "4 (Swiss & High-Contrast)",
+  "description": "Minimalist, photo-first cloud gallery with a Pinterest-style masonry layout. The UI should be almost invisible, letting the user's photos stand out.",
+  "colors": {
+    "background": "#FAFAFA",
+    "surface": "#FFFFFF",
+    "text_primary": "#0A0A0A",
+    "text_secondary": "#52525B",
+    "accent": "#09090B",
+    "border": "#E4E4E7",
+    "destructive": "#EF4444"
+  },
+  "typography": {
+    "heading_font": "Outfit",
+    "body_font": "Figtree",
+    "h1": "text-4xl sm:text-5xl font-semibold tracking-tight text-neutral-900",
+    "h2": "text-2xl sm:text-3xl font-medium tracking-tight text-neutral-900",
+    "h3": "text-xl font-medium tracking-tight",
+    "body": "text-base text-neutral-600 leading-relaxed",
+    "small": "text-sm text-neutral-500 uppercase tracking-widest"
+  },
+  "layout": {
+    "spacing": "Generous outer padding (p-8 to p-12), tight inner gaps (gap-4 or gap-6).",
+    "masonry": "Use Tailwind CSS columns for masonry: `columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6`. Use `break-inside-avoid` on child items to prevent images from splitting across columns.",
+    "upload_zone": "Large drag-and-drop area with dashed border (`border-2 border-dashed border-neutral-300`), rounded-xl, background `bg-neutral-50 hover:bg-neutral-100 transition-colors`."
+  },
+  "components": {
+    "cards": "Cardless design for the photos. The image itself is the card, rounded-lg with subtle hover effect.",
+    "buttons": "High contrast black buttons (`bg-neutral-900 text-white hover:bg-neutral-800`) or outlined variants. Rounded-md.",
+    "modals": "Use Shadcn Dialog for photo preview/metadata. Crystal glass background overlay (`bg-white/70 backdrop-blur-xl`) for the modal backdrop.",
+    "thumbnails": "Optimized images filling the container. `w-full h-auto object-cover rounded-lg shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1`.",
+    "navigation": "Minimal top nav, sticky with glassmorphism (`backdrop-blur-xl bg-white/70`), containing Logo, Upload CTA, and User Profile."
+  },
+  "interactions": {
+    "hover": "Subtle translation (`-translate-y-1`), slight shadow increase, or a very gentle scale (`scale-[1.02]`) on photos.",
+    "loading": "Skeleton loaders matching the masonry shape for lazy loading.",
+    "drag_drop": "Active state for drag zone should highlight prominently (e.g., solid border or tinted background)."
+  },
+  "image_urls": [
+    {
+      "url": "https://images.unsplash.com/photo-1488972685288-c3fd157d7c7a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzJ8MHwxfHNlYXJjaHwxfHxtaW5pbWFsaXN0JTIwYXJjaGl0ZWN0dXJlJTIwYWJzdHJhY3R8ZW58MHx8fHwxNzc4ODU0ODI5fDA&ixlib=rb-4.1.0&q=85",
+      "category": "gallery_sample",
+      "description": "Minimalist architecture abstract - for sample gallery populating or empty states"
+    },
+    {
+      "url": "https://images.unsplash.com/photo-1531591022136-eb8b0da1e6d0?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzJ8MHwxfHNlYXJjaHw0fHxtaW5pbWFsaXN0JTIwYXJjaGl0ZWN0dXJlJTIwYWJzdHJhY3R8ZW58MHx8fHwxNzc4ODU0ODI5fDA&ixlib=rb-4.1.0&q=85",
+      "category": "gallery_sample",
+      "description": "White and black abstract painting - sample gallery image"
+    },
+    {
+      "url": "https://images.unsplash.com/photo-1567943183748-3a7542120c90?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzJ8MHwxfHNlYXJjaHwyfHxtaW5pbWFsaXN0JTIwYXJjaGl0ZWN0dXJlJTIwYWJzdHJhY3R8ZW58MHx8fHwxNzc4ODU0ODI5fDA&ixlib=rb-4.1.0&q=85",
+      "category": "gallery_sample",
+      "description": "Curved building with sky - sample gallery image"
+    },
+    {
+      "url": "https://images.unsplash.com/photo-1693929268060-ea24d5e0f830?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzNTl8MHwxfHNlYXJjaHwxfHxsYW5kc2NhcGUlMjBuYXR1cmUlMjB3aWRlfGVufDB8fHx8MTc3ODg1NDgzMHww&ixlib=rb-4.1.0&q=85",
+      "category": "gallery_sample",
+      "description": "Landscape nature wide - sample gallery image"
+    }
+  ],
+  "icon_library": "@phosphor-icons/react",
+  "instructions_to_main_agent": [
+    "Run `yarn add @phosphor-icons/react` before starting implementation.",
+    "Include Google Fonts for 'Outfit' and 'Figtree' in public/index.html.",
+    "Use Tailwind CSS columns utility for the masonry layout (`columns-1 sm:columns-2 lg:columns-3 xl:columns-4 space-y-6`). Do not use any third party masonry library unless absolutely necessary.",
+    "Ensure all interactive elements have `data-testid` attributes.",
+    "Use Shadcn Dialog for image detail view and metadata.",
+    "Use standard HTML5 drag and drop API or a lightweight wrapper for the upload zone.",
+    "Prioritize optical alignment and generous spacing. Make the app feel airy and uncluttered.",
+    "The layout must be responsive, defaulting to 1 column on mobile."
+  ]
+}

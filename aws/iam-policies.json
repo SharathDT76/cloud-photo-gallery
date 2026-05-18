@@ -1,0 +1,70 @@
+{
+  "AppRuntimeRole": {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "S3OriginalsRW",
+        "Effect": "Allow",
+        "Action": [
+          "s3:PutObject",
+          "s3:GetObject",
+          "s3:HeadObject",
+          "s3:DeleteObject"
+        ],
+        "Resource": "arn:aws:s3:::shadow-photo-originals-709147558119/*"
+      },
+      {
+        "Sid": "S3ThumbnailsRW",
+        "Effect": "Allow",
+        "Action": [
+          "s3:PutObject",
+          "s3:GetObject",
+          "s3:DeleteObject"
+        ],
+        "Resource": "arn:aws:s3:::shadow-photo-thumbnails-709147558119/*"
+      },
+      {
+        "Sid": "DDBPhotoMeta",
+        "Effect": "Allow",
+        "Action": [
+          "dynamodb:PutItem",
+          "dynamodb:GetItem",
+          "dynamodb:Query",
+          "dynamodb:DeleteItem",
+          "dynamodb:UpdateItem"
+        ],
+        "Resource": "arn:aws:dynamodb:ap-south-1:*:table/PhotoGalleryMetadata"
+      },
+      {
+        "Sid": "CognitoUserMgmt",
+        "Effect": "Allow",
+        "Action": [
+          "cognito-idp:SignUp",
+          "cognito-idp:ConfirmSignUp",
+          "cognito-idp:ResendConfirmationCode",
+          "cognito-idp:InitiateAuth",
+          "cognito-idp:GetUser",
+          "cognito-idp:AdminGetUser"
+        ],
+        "Resource": "arn:aws:cognito-idp:ap-south-1:*:userpool/ap-south-1_uEX9otfnG"
+      }
+    ]
+  },
+  "CloudFrontReadFromThumbnailsBucketPolicy": {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "AllowCloudFrontServicePrincipalReadOnly",
+        "Effect": "Allow",
+        "Principal": { "Service": "cloudfront.amazonaws.com" },
+        "Action": "s3:GetObject",
+        "Resource": "arn:aws:s3:::shadow-photo-thumbnails-709147558119/*",
+        "Condition": {
+          "StringEquals": {
+            "AWS:SourceArn": "arn:aws:cloudfront::<YOUR_ACCOUNT_ID>:distribution/<YOUR_DISTRIBUTION_ID>"
+          }
+        }
+      }
+    ]
+  }
+}
